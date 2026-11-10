@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+runs/
+.DS_Store
+*.safetensors
+math500_test.jsonl

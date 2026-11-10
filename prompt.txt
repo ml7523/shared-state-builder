@@ -1,0 +1,7 @@
+Solve the following math problem step by step.
+
+At the end of your response, write exactly one line beginning with
+"Final answer:" followed by your final answer.
+
+Problem:
+{question}
