@@ -1,4 +1,5 @@
 import json
+import hashlib
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
@@ -6,7 +7,7 @@ from unittest.mock import patch
 
 from state_builder.backend import Generation
 from state_builder.cuts import build_records, select_cut_positions
-from state_builder.dataset import DATA_PATH, download_math500, load_math500
+from state_builder.dataset import download_math500, load_math500
 from state_builder.run import main
 
 
@@ -111,10 +112,13 @@ class CutTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "pinned test split"):
                     download_math500(target)
             self.assertFalse(target.exists())
-            with patch("state_builder.dataset.urlopen",
-                       return_value=Response(DATA_PATH.read_bytes())):
-                self.assertEqual(download_math500(target), target)
-            self.assertEqual(target.read_bytes(), DATA_PATH.read_bytes())
+            valid = b'{"problem":"test","answer":"1","unique_id":"test"}\n'
+            with patch("state_builder.dataset.DATA_SHA256",
+                       hashlib.sha256(valid).hexdigest()):
+                with patch("state_builder.dataset.urlopen",
+                           return_value=Response(valid)):
+                    self.assertEqual(download_math500(target), target)
+            self.assertEqual(target.read_bytes(), valid)
 
 
 class RunnerTests(unittest.TestCase):
